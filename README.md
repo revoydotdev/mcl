@@ -3,7 +3,7 @@
 A Rust runtime and declarative language for building applications where an LLM narrates and a deterministic engine enforces the rules. You describe the world — rooms, entities, actions, knowledge boundaries — in `.mcl` files. The runtime wires the LLM to domain resolvers (combat, inventory, dialogue) through a Pregel-style node graph. The LLM generates prose; the engine decides what actually happens.
 
 > **Status (2026-08):** Stage 1 is complete. Most of Stage 2 is implemented and
-> unreleased; Stage 3 is extracting the registry and arbiter into a
+> unreleased; Stage 3 is planned to extract the registry and arbiter into a
 > domain-independent action-validation layer. See [Project status](#project-status)
 > for the exact boundary.
 
@@ -232,7 +232,7 @@ CI runs on a self-hosted Arch Linux runner; macOS Sonoma and Windows 11 lanes ar
 
 ## Contributing
 
-This is currently a single-author research project on `master`. PRs welcome once the Stage 2 milestones land and `main` stabilizes. If you're reading this before then and want to discuss the signal protocol, registry arbiter design, or the graph-memory model, open an issue.
+This is currently a single-author research project on `main`. PRs welcome once the Stage 2 milestones land and the public interfaces stabilize. If you want to discuss the signal protocol, registry arbiter design, or the graph-memory model, open an issue.
 
 Commit style: conventional (`feat:`, `fix:`, `chore:`, `refactor:`, `ci:`, `docs:`, `test:`, `perf:`). Semver-respecting splits. No AI attribution in commit trailers.
 
