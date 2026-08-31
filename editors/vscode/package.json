@@ -1,0 +1,21 @@
+{
+  "name": "mcl",
+  "displayName": "MCL",
+  "description": "Syntax highlighting for Model Control Language",
+  "version": "0.1.0",
+  "publisher": "mcl",
+  "engines": { "vscode": "*" },
+  "contributes": {
+    "languages": [{
+      "id": "mcl",
+      "aliases": ["MCL", "mcl"],
+      "extensions": [".mcl"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "mcl",
+      "scopeName": "source.mcl",
+      "path": "./mcl.tmLanguage.json"
+    }]
+  }
+}

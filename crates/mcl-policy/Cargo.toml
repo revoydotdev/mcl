@@ -1,0 +1,24 @@
+[package]
+name = "mcl-policy"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "MCL policy compiler, evaluator, and type checker"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "policy", "type-system", "compiler"]
+categories = ["game-development", "compilers"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+indexmap = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+insta = { workspace = true }
+
+[lints]
+workspace = true

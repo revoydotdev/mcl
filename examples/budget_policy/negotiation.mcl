@@ -1,0 +1,92 @@
+---
+context: budget_policy
+type: scene
+domain: negotiation
+---
+
+# State
+buyer_budget_max: 50000 @secret(audience=buyer)
+buyer_preferences: ["reliable", "fast_delivery", "warranty"] @secret(audience=buyer)
+seller_cost_basis: 35000 @secret(audience=seller)
+seller_min_margin: 15000 @secret(audience=seller)
+current_offer: null
+counter_offers: 0
+
+# Entities
+- buyer:
+    type: npc
+    disposition: cautious
+    knowledge: [market_prices, competitor_quotes]
+- seller:
+    type: npc
+    disposition: confident
+    knowledge: [production_costs, market_demand]
+
+# Actions
+- make_offer:
+    description: "Submit a price proposal"
+    trigger: [offer, propose, bid, suggest]
+    mutates: { current_offer: offer }
+    effect: [state_mutating]
+- counter_offer:
+    description: "Respond with a counter-proposal"
+    trigger: [counter, counter_offer, reject, negotiate]
+    mutates: { counter_offers: counter_offers + 1 }
+    effect: [state_mutating]
+- accept:
+    description: "Accept the current offer"
+    trigger: [accept, agree, deal, done]
+    effect: [pure]
+- walk_away:
+    description: "End negotiations without agreement"
+    trigger: [walk, leave, done, no_deal]
+    effect: [pure]
+
+# Transitions
+- agreement:
+    when: current_offer != null && counter_offers > 0
+    auto: true
+    direction: end
+
+# Narrator
+tone: professional
+voice: third_person
+tense: present
+context: "A business negotiation is in progress. The buyer seeks a competitive price while protecting their maximum budget. The seller aims to maintain profit margins while closing the deal. Each side has private information they must not disclose."
+style_notes: "Maintain a neutral, business-like tone. The narrator should describe the negotiation flow without revealing confidential information."
+forbidden: [super, awesome, incredible]
+
+# Narrator Constraints
+must_not_mention: ["@secret(audience=buyer)", "@secret(audience=seller)"]
+on_violation: deny
+
+# Knowledge
+- negotiation_protocol
+- market_conditions
+- !buyer_internal_calculations
+- !seller_profit_margins
+- !competitor_pricing
+
+# Constraints
+- The buyer must not reveal their maximum budget
+- The seller must not reveal their cost basis
+- Offers must be in good faith and reasonable
+- The narrator must filter out any labeled secret information
+
+# Policies
+# Intent: prevent the buyer's narrator from referencing budget figures, and
+# gate seller-originated propose signals on a confidence floor. In-language
+# label predicates (`labels(secret)`, `node.agent`) are not yet supported by
+# the type checker, so these policies use the typecheck-clean string-literal
+# and signal-field forms as a stand-in.
+policy buyer_no_budget_disclosure {
+  on:           narration_emit
+  require:      not contains(prose, "max_budget")
+  on_violation: rewrite
+}
+policy seller_signal_strip {
+  on:           signal_dispatch
+  match:        signal.kind == "propose"
+  require:      signal.confidence > 0.5
+  on_violation: reject(reason="cost_basis_leak")
+}

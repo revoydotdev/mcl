@@ -1,0 +1,34 @@
+[package]
+name = "mcl-server"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "WebSocket server for browser-based MCL sessions"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "websocket", "server"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }
+mcl-nodes = { path = "../mcl-nodes", version = "0.1.0" }
+mcl-runtime = { path = "../mcl-runtime", version = "0.1.0" }
+mcl-llm = { path = "../mcl-llm", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+axum = { workspace = true }
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+tower-http = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+clap = { workspace = true }
+futures-util = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+tower = "0.5"

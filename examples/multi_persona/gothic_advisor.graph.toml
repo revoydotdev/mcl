@@ -1,0 +1,89 @@
+[graph]
+name = "multi_persona_demo"
+
+[nodes.client]
+type = "client"
+
+[nodes.narrator]
+type = "llm"
+priority = 1
+config.backend = "ollama"
+config.model = "llama3"
+
+[nodes.advisor]
+type = "llm"
+priority = 2
+config.backend = "ollama"
+config.model = "llama3"
+config.system_prompt_override = "You are a tactical advisor whispering guidance to the player. Keep responses to 1-2 sentences. Be practical and strategic. Prefix your advice with [ADVISOR]. Do not narrate — only give tactical tips based on what the narrator just described."
+
+[nodes.game_engine]
+type = "game_engine"
+config.contexts_dir = "examples/multi_persona"
+config.start_context = "haunted_library"
+
+[nodes.combat]
+type = "combat_resolver"
+
+[nodes.inventory]
+type = "inventory_resolver"
+
+# Player input goes to narrator
+[[edges]]
+from = "client"
+to = "narrator"
+channel = "user_input"
+
+# Narrator output goes to game engine
+[[edges]]
+from = "narrator"
+to = "game_engine"
+channel = "narrative"
+
+# Game engine output goes to client AND advisor
+[[edges]]
+from = "game_engine"
+to = "client"
+channel = "display"
+
+[[edges]]
+from = "game_engine"
+to = "advisor"
+channel = "display"
+
+# Advisor output goes directly to client
+[[edges]]
+from = "advisor"
+to = "client"
+channel = "display"
+
+# Standard feedback/combat/inventory loops
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "feedback"
+
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "system_prompt"
+
+[[edges]]
+from = "game_engine"
+to = "combat"
+channel = "combat_action"
+
+[[edges]]
+from = "combat"
+to = "game_engine"
+channel = "resolution"
+
+[[edges]]
+from = "game_engine"
+to = "inventory"
+channel = "inventory_action"
+
+[[edges]]
+from = "inventory"
+to = "game_engine"
+channel = "resolution"

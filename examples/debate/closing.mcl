@@ -1,0 +1,35 @@
+---
+context: closing
+type: scene
+domain: debate
+---
+
+# State
+round: 4
+final_statements: false
+
+# Entities
+- moderator:
+    type: npc
+    disposition: neutral
+    knowledge: [topic, all_arguments, scoring_rubric]
+
+# Actions
+- closing_statement:
+    description: "Deliver your closing argument"
+    trigger: [close, conclude, final, closing, summarize]
+- vote:
+    description: "Cast your vote for the winning side"
+    trigger: [vote, choose, decide, winner, select]
+    mutates: { final_statements: true }
+
+# Narrator
+tone: formal
+voice: third_person
+tense: present
+context: "The debate has concluded its rounds. Each side now delivers a closing statement. The moderator will then call for a vote."
+forbidden: [definitely, obviously, clearly]
+
+# Knowledge
+- all_arguments_presented
+- !judge_final_decision

@@ -1,0 +1,22 @@
+[package]
+name = "mcl-lang"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "MCL language compiler, constraint tags, and validation"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "language", "compiler"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }
+indexmap = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

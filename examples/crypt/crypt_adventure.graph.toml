@@ -1,0 +1,106 @@
+[graph]
+name = "crypt_adventure"
+
+# ── Registry (Stage 2) ─────────────────────────────────────
+[registry]
+enabled = true
+campaign_id = "crypt"
+fsync_policy = "every_step"
+data_dir = ".mcl/registry/"
+arbiter_chain = ["schema", "dedup", "hallucination", "action_whitelist"]
+
+# ── Domain Nodes ────────────────────────────────────────────
+[nodes.client]
+type = "client"
+
+[nodes.narrator]
+type = "llm"
+config.backend = "ollama"
+config.model = "llama3"
+
+[nodes.game_engine]
+type = "game_engine"
+config.contexts_dir = "examples/crypt"
+config.start_context = "crypt_antechamber"
+
+[nodes.combat]
+type = "combat_resolver"
+
+[nodes.inventory]
+type = "inventory_resolver"
+
+# ── Governing Nodes ─────────────────────────────────────────
+# Future: uncomment when graph.toml parser supports governing nodes.
+# [nodes.summarizer]
+# kind = "summarizer"
+# policy = "TurnWindow(10)"
+#
+# [nodes.scheduler]
+# kind = "scheduler"
+# max_wait = 30
+# priority_order = ["combat", "narrator", "client"]
+
+# ── Edges ───────────────────────────────────────────────────
+# Client → LLM
+[[edges]]
+from = "client"
+to = "narrator"
+channel = "user_input"
+
+# LLM → Game Engine
+[[edges]]
+from = "narrator"
+to = "game_engine"
+channel = "narrative"
+
+# Game Engine → Client (display)
+[[edges]]
+from = "game_engine"
+to = "client"
+channel = "display"
+
+# Game Engine → Combat
+[[edges]]
+from = "game_engine"
+to = "combat"
+channel = "combat_action"
+
+# Combat → Game Engine
+[[edges]]
+from = "combat"
+to = "game_engine"
+channel = "resolution"
+
+# Game Engine → Inventory
+[[edges]]
+from = "game_engine"
+to = "inventory"
+channel = "inventory_action"
+
+# Inventory → Game Engine
+[[edges]]
+from = "inventory"
+to = "game_engine"
+channel = "resolution"
+
+# Game Engine → LLM (feedback + system prompt)
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "feedback"
+
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "system_prompt"
+
+# Future: wildcard edges for governing nodes
+# [[edges]]
+# from = "summarizer"
+# to = "summarizer"
+# channel = "*"
+#
+# [[edges]]
+# from = "scheduler"
+# to = "scheduler"
+# channel = "*"

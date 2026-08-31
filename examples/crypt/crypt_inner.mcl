@@ -1,0 +1,83 @@
+---
+context: crypt_inner
+type: room
+domain: rpg
+---
+# This room is reachable from crypt_antechamber (north) once the
+# iron door is unlocked.  It also links east to crypt_treasury.
+
+# ── State ────────────────────────────────────────────────────
+# Room-level boolean flags.  The runtime tracks these across the
+# session.  They can be mutated by actions (see below).
+sarcophagus_open: false       # Has the sarcophagus lid been pried off?
+trap_triggered: false         # Did the cold-blast trap fire?
+
+# ── Entities ─────────────────────────────────────────────────
+# Each entity has a type, stats, and optional knowledge lists.
+# The game engine uses `type` to decide which resolver handles it.
+- ghost_priest:
+    type: npc
+    disposition: neutral
+    knowledge: [tomb_history, curse_warning, treasure_location]
+
+# ── Items ────────────────────────────────────────────────────
+# Items can be placed on surfaces, near landmarks, or gated behind
+# conditions.  `visible_when` hides the item until a state flag is set.
+- ancient_amulet: { on: sarcophagus, visible_when: sarcophagus_open }
+- stone_tablet: { on: wall, readable: true }
+
+# ── Actions ──────────────────────────────────────────────────
+# Players trigger actions.  `requires` lists preconditions (inventory
+# checks or state flags).  `mutates` patches room state when the
+# action fires.  `resolution` names the external system that
+# determines the outcome.
+- open_sarcophagus:
+    requires: [!trap_triggered]
+    mutates: { sarcophagus_open: true, trap_triggered: true }
+    description: "Pry open the stone sarcophagus"
+- speak:
+    target: enum(entities)
+    mode: dialogue
+    description: "Speak with the ghost priest"
+- read_tablet:
+    description: "Read the inscriptions on the stone tablet"
+- pickup:
+    target: enum(items)
+    resolution: inventory_system
+    description: "Pick up an item"
+- look:
+    description: "Examine your surroundings"
+
+# ── Transitions ──────────────────────────────────────────────
+# Links to other rooms.  `when` is a state expression that must be
+# true before the player can move.  `direction` is the compass exit.
+- crypt_antechamber:
+    direction: south
+- crypt_treasury:
+    when: sarcophagus_open == true
+    direction: east
+
+# ── Narrator ─────────────────────────────────────────────────
+# Instructions for the LLM when narrating this room.  `tone` sets
+# the mood, `voice` the perspective, `forbidden` lists words the
+# narrator must never use.
+tone: reverent
+voice: second_person
+tense: present
+context: "The inner sanctum of the crypt opens before you. A massive stone sarcophagus dominates the center of the chamber, covered in faded hieroglyphs. The air here is unnaturally still. A translucent figure hovers near the far wall — a spectral priest, watching you with hollow eyes. Ancient text is carved into a stone tablet set into the wall."
+style_notes: "The ghost priest is ancient and weary, not malicious. It speaks in formal, archaic language. The sarcophagus trap releases a burst of cold air, not physical damage."
+forbidden: [cool, basically, literally]
+
+# ── Knowledge ────────────────────────────────────────────────
+# What the LLM knows (positive) or must ignore (! prefix) about
+# this context.  This constrains hallucination.
+- tomb_history
+- curse_warning
+- !outside_world
+
+# ── Constraints ──────────────────────────────────────────────
+# Free-form rules the game engine enforces.  These are softer than
+# state/action constraints — they guide the LLM and runtime logic.
+- The ghost priest will warn the player about the trap if asked
+- Opening the sarcophagus triggers a cold blast but is not lethal
+- The amulet is the goal — obtaining it completes the dungeon

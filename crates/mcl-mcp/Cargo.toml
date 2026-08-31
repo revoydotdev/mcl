@@ -1,0 +1,28 @@
+[package]
+name = "mcl-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "MCP server exposing MCL game engine as tools"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "mcp", "llm", "tools"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-parse = { path = "../mcl-parse", version = "0.1.0" }
+mcl-runtime = { path = "../mcl-runtime", version = "0.1.0" }
+mcl-domains = { path = "../mcl-domains", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+indexmap = { workspace = true }
+rand = "0.8"
+
+[dev-dependencies]
+env_logger = { workspace = true }
+
+[lints]
+workspace = true

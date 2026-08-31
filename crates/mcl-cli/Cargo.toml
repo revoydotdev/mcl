@@ -1,0 +1,37 @@
+[package]
+name = "mcl-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Command-line interface for the MCL game engine"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "cli", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-parse = { path = "../mcl-parse", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+mcl-runtime = { path = "../mcl-runtime", version = "0.1.0" }
+mcl-llm = { path = "../mcl-llm", version = "0.1.0" }
+mcl-domains = { path = "../mcl-domains", version = "0.1.0" }
+mcl-mcp = { path = "../mcl-mcp", version = "0.1.0" }
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }
+mcl-nodes = { path = "../mcl-nodes", version = "0.1.0" }
+mcl-registry = { path = "../mcl-registry", version = "0.1.0" }
+mcl-policy = { path = "../mcl-policy", version = "0.1.0" }
+clap = { workspace = true }
+tokio = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+assert_cmd = { workspace = true }
+predicates = { workspace = true }
+tempfile = { workspace = true }

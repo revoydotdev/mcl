@@ -1,0 +1,15 @@
+target/
+.sisyphus/evidence/
+
+# studio runtime ephemera
+.studio/heartbeat
+.studio/done-marker
+.studio/blocked-marker
+.studio/.tmux-session
+.studio/.tmux-pane.snapshot
+.studio/.opencode-server.pid
+.studio/.opencode-server.port
+.studio/.opencode-session.id
+
+# per-session claude project state (not project artefacts)
+.claude/

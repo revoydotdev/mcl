@@ -1,0 +1,28 @@
+[package]
+name = "mcl-wasm"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "WebAssembly bindings for the MCL language parser and prompt builder"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "wasm", "parser"]
+categories = ["game-development", "wasm"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-parse = { path = "../mcl-parse", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+wasm-bindgen = "0.2"
+serde = { workspace = true }
+serde_json = { workspace = true }
+indexmap = { workspace = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[lints]
+workspace = true

@@ -1,0 +1,12 @@
+{"turn":1,"input":"look around","output":"Dust settles on the ancient stone walls. MCL::noop()","signals":["noop()"],"state_changes":{}}
+{"turn":2,"input":"examine the skeleton guard","output":"The skeleton guard stands motionless. MCL::noop()","signals":["noop()"],"state_changes":{}}
+{"turn":3,"input":"pick up the flint","output":"You pick up the flint. MCL::action(pickup)","signals":["action(pickup)"],"state_changes":{}}
+{"turn":4,"input":"light the torch","output":"You strike the flint against the wall. MCL::action(light_torch)","signals":["action(light_torch)"],"state_changes":{"lit":"true"}}
+{"turn":5,"input":"examine the rusty key","output":"The torch flickers to life revealing a rusty key. MCL::noop()","signals":["noop()"],"state_changes":{}}
+{"turn":6,"input":"pick up the rusty key","output":"You pick up the rusty key. MCL::action(pickup)","signals":["action(pickup)"],"state_changes":{}}
+{"turn":7,"input":"attack the skeleton guard","output":"You swing at the skeleton. MCL::action(attack)","signals":["action(attack)"],"state_changes":{}}
+{"turn":8,"input":"attack the skeleton guard","output":"The skeleton staggers. MCL::action(attack)","signals":["action(attack)"],"state_changes":{}}
+{"turn":9,"input":"attack the skeleton guard","output":"Your blade strikes true. MCL::action(attack)","signals":["action(attack)"],"state_changes":{}}
+{"turn":10,"input":"unlock the northern door","output":"You unlock the northern door. MCL::action(unlock_door)","signals":["action(unlock_door)"],"state_changes":{"door_north":"unlocked"}}
+{"turn":11,"input":"go north","output":"You pass through the doorway. MCL::transition(crypt_inner)","signals":["transition(crypt_inner)"],"state_changes":{"current_context":"crypt_inner"}}
+{"turn":12,"input":"look around","output":"The inner sanctum stretches before you. MCL::noop()","signals":["noop()"],"state_changes":{}}

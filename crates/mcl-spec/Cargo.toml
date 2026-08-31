@@ -1,0 +1,23 @@
+[package]
+name = "mcl-spec"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Core types and error definitions for the MCL language"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "gamedev", "ai"]
+categories = ["game-development"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+indexmap = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+mcl-registry = { path = "../mcl-registry", version = "0.1.0" }
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }

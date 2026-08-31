@@ -1,0 +1,98 @@
+---
+context: phi_export_gate
+type: scene
+domain: clinical
+---
+
+# State
+patient_records: []
+export_requests: []
+audit_log: []
+last_export_time: null
+
+# Entities
+- doctor:
+    type: npc
+    role: physician
+    knowledge: [patient_history, diagnosis_codes, treatment_plans]
+- patient:
+    type: npc
+    role: subject
+    knowledge: [personal_history, symptoms]
+- auditor:
+    type: npc
+    role: compliance_officer
+    knowledge: [regulations, audit_procedures]
+
+# Actions
+- request_export:
+    description: "Request export of clinical data"
+    trigger: [export, download, retrieve, extract]
+    args: { patient_id: string, fields: list, format: string }
+    effect: [external(io, deterministic), cacheable]
+- generate_report:
+    description: "Generate a clinical audit report"
+    trigger: [report, audit, summary, analysis]
+    args: { patient_id: string, time_range: string }
+    effect: [pure]
+- log_access:
+    description: "Log access to patient records"
+    trigger: [log, record, track, monitor]
+    args: { user: string, patient_id: string, timestamp: string }
+    effect: [external(io, deterministic), audit_verbose]
+- validate_request:
+    description: "Validate an export request against policy"
+    trigger: [validate, check, verify, authorize]
+    args: { request_id: string, requester: string, patient_id: string }
+    effect: [pure]
+
+# Transitions
+- export_complete:
+    when: last_export_time != null
+    auto: false
+    direction: continue
+
+# Narrator
+tone: clinical
+voice: third_person
+tense: present
+context: "A clinical data export system with strict PHI protection. Only authorized auditors may export patient data. All exports are logged and reviewed for compliance."
+style_notes: "Use precise medical terminology. Maintain confidentiality and privacy in all descriptions."
+
+# Knowledge
+- hipaa_regulations
+- phi_data_classification
+- export_protocols
+- !patient_identifiers
+- !medical_history_details
+
+# Constraints
+- Patient names and SSNs must never be included in exports
+- Only auditors with proper authorization may request exports
+- All export requests must be logged with timestamp and requester
+- Direct patient data access is prohibited without explicit consent
+
+# Policies
+# Three gates: PHI export must be initiated by an auditor and the entry's
+# identifying fields are dropped; outbound patient_data signals must clear
+# a confidence floor; export-request admission triggers human confirmation.
+# Some R2 features (multi-arg `contains`, closures, `action_complete` event)
+# are not yet supported, so these policies use the typecheck-clean forms.
+policy phi_audit_export_gate {
+  on:           audit_export
+  require:      requester == "auditor"
+  transform:    drop_args([name, ssn])
+  on_violation: deny
+}
+policy patient_data_redaction {
+  on:           signal_dispatch
+  match:        signal.kind == "patient_data"
+  require:      signal.confidence > 0.9
+  on_violation: rewrite
+}
+policy audit_log_verification {
+  on:           signal_admit
+  match:        signal.kind == "request_export"
+  require:      signal.confidence > 0.0
+  on_violation: demand_confirmation(prompt="Export not logged.")
+}

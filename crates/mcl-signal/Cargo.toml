@@ -1,0 +1,21 @@
+[package]
+name = "mcl-signal"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Signal extraction and parsing for MCL LLM responses"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "signals", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+indexmap = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

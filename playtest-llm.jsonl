@@ -1,0 +1,5 @@
+{"run":1,"turns":20,"completed":true,"error":null,"duration_ms":74150,"transcript":[]}
+{"run":2,"turns":0,"completed":false,"error":"execution error: player LLM error: llm error: openai response parse error: error decoding response body","duration_ms":7608,"transcript":[]}
+{"run":3,"turns":20,"completed":true,"error":null,"duration_ms":86111,"transcript":[]}
+{"run":4,"turns":20,"completed":true,"error":null,"duration_ms":89879,"transcript":[]}
+{"run":5,"turns":20,"completed":true,"error":null,"duration_ms":75243,"transcript":[]}

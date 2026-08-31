@@ -1,0 +1,73 @@
+---
+context: confidence_routing
+type: scene
+domain: clinical_decision_support
+---
+
+# State
+patient_chief_complaint: null
+suggested_treatment: null
+review_queue: []
+
+# Entities
+- patient:
+    type: npc
+    role: subject
+    knowledge: [chief_complaint, vitals]
+- clinician:
+    type: npc
+    role: physician
+    knowledge: [history, differential, formulary]
+
+# Actions
+- propose_treatment:
+    description: "CDSS proposes a treatment given patient state."
+    trigger: [propose, suggest, recommend]
+    args: { medication: string, dose: string }
+    effect: [pure]
+- confirm_treatment:
+    description: "Clinician confirms a proposed treatment."
+    trigger: [confirm, accept, prescribe]
+    args: { medication: string }
+    effect: [state_mutating]
+
+# Transitions
+- prescribed:
+    when: suggested_treatment != null
+    auto: false
+    direction: continue
+
+# Narrator
+tone: clinical
+voice: third_person
+tense: present
+context: "A clinical decision support pipeline. The CDSS proposes treatments and the clinician confirms. Low-confidence proposals must be reviewed by a human before any state mutation."
+style_notes: "Use precise medical phrasing. Never inflate certainty."
+
+# Knowledge
+- formulary
+- contraindication_rules
+- !patient_billing_information
+
+# Constraints
+- Treatment proposals below 0.7 confidence must route to human review
+- Confirmed treatments only fire when admission policy passes
+- The narrator must not invent confidence numbers
+
+# Policies
+# Two gates per R2 §4.3: a low-confidence treatment-proposal signal routes
+# to a human_review channel rather than executing; high-confidence proposals
+# admit normally. The threshold lives in the require clause; the route_to
+# violation action defers execution to the supervisor queue.
+policy low_confidence_treatment_to_review {
+  on:           signal_admit
+  match:        signal.kind == "propose_treatment"
+  require:      signal.confidence > 0.7
+  on_violation: route_to(channel="human_review")
+}
+policy high_risk_dispatch_floor {
+  on:           signal_dispatch
+  match:        signal.kind == "confirm_treatment"
+  require:      signal.confidence > 0.85
+  on_violation: demand_confirmation(prompt="Confirm low-confidence treatment?")
+}

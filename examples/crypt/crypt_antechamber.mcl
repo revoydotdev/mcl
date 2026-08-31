@@ -1,0 +1,100 @@
+---
+context: crypt_antechamber
+type: room
+domain: rpg
+---
+# Frontmatter: the --- delimiters wrap a TOML-like header.  The parser
+# uses the first key to detect the file type.  A "context" key means
+# this file defines a room/scene.  "domain" groups related rooms.
+
+# ── State ────────────────────────────────────────────────────
+# Room-level boolean flags and values.  The runtime tracks these
+# across the session.  They can be mutated by actions (see below).
+lit: false                   # Is the torch sconce lit?
+door_north: locked           # Door state: locked | unlocked
+
+# ── Entities ─────────────────────────────────────────────────
+# Each entity has a type, stats, and optional knowledge lists.
+# The game engine uses `type` to decide which resolver handles it
+# (e.g. enemies → combat_system).
+- skeleton_guard:
+    type: enemy
+    disposition: hostile
+    hp: 12
+    ac: 12
+    knowledge: [guards_tomb, knows_nothing_of_key]
+
+# ── Items ────────────────────────────────────────────────────
+# Items can be placed on surfaces, near landmarks, or gated behind
+# conditions.  `visible_when` hides the item until a state flag is set.
+- rusty_key: { on: floor, visible_when: lit }
+- torch_sconce: { on: wall, interactive: true }
+- flint: { on: ground, near: entrance }
+
+# ── Actions ──────────────────────────────────────────────────
+# Players trigger actions.  `requires` lists preconditions (inventory
+# checks or state flags).  `mutates` patches room state when the
+# action fires.  `resolution` names the external system that
+# determines the outcome (combat_system, inventory_system, etc.).
+# `trigger` lists player phrases that should map to this action.
+- look:
+    description: "Survey the room and surroundings"
+    trigger: [look, look around, survey, observe, what do I see]
+- examine:
+    target: enum(entities, items)
+    description: "Inspect a specific entity or item up close"
+    trigger: [examine, inspect, study, investigate, look at, check]
+- attack:
+    target: enum(entities.enemies)
+    resolution: combat_system
+    description: "Strike or fight an enemy"
+    trigger: [attack, hit, strike, swing, fight, slash, stab, lunge]
+- pickup:
+    target: enum(items)
+    resolution: inventory_system
+    description: "Pick up an item from the environment"
+    trigger: [pick up, grab, take, collect, get]
+- light_torch:
+    requires: [inventory.flint]
+    mutates: { lit: true }
+    description: "Light the torch sconce using the flint"
+    trigger: [light, light torch, light sconce, use flint]
+- unlock_door:
+    target: door_north
+    requires: [inventory.rusty_key]
+    mutates: { door_north: unlocked }
+    description: "Unlock the northern door using a key"
+    trigger: [unlock, use key, open door, unlock door]
+
+# ── Transitions ──────────────────────────────────────────────
+# Links to other rooms.  `when` is a state expression that must be
+# true before the player can move.  `direction` is the compass exit.
+- crypt_inner:
+    when: door_north == unlocked
+    direction: north
+
+# ── Narrator ─────────────────────────────────────────────────
+# Instructions for the LLM when narrating this room.  `tone` sets
+# the mood, `voice` the perspective, `forbidden` lists words the
+# narrator must never use.
+tone: dread
+voice: second_person
+tense: present
+context: "You stand at the entrance of an ancient crypt. Dust motes drift through a shaft of pale light from the passage behind you. The air is thick with the smell of decay and old stone. A skeleton in rusted armor stands motionless near a heavy iron door to the north. Shadows pool in the corners — you can barely make out the shapes of objects on the floor."
+style_notes: "Keep descriptions atmospheric and tense. The skeleton is not immediately aggressive — it reacts when provoked or approached."
+forbidden: [epic, awesome, incredible]
+
+# ── Knowledge ────────────────────────────────────────────────
+# What the LLM knows (positive) or must ignore (! prefix) about
+# this context.  This constrains hallucination — the narrator may
+# reference `guards_tomb` but must never mention `secret_passage`.
+- guards_tomb
+- !secret_passage
+- !treasure_room
+
+# ── Constraints ──────────────────────────────────────────────
+# Free-form rules the game engine enforces.  These are softer than
+# state/action constraints — they guide the LLM and runtime logic.
+- The skeleton does not attack first unless the player approaches the door
+- The rusty key is only visible when the room is lit
+- The flint is near the entrance and easy to find

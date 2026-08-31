@@ -1,0 +1,52 @@
+---
+context: question_2
+type: step
+domain: quiz
+---
+
+# State
+answered: false
+question: "Which trait must be implemented for a type to be used in a HashMap as a key?"
+
+# Entities
+- quizmaster:
+    type: npc
+    disposition: friendly
+    knowledge: [question, correct_answer, rust_traits]
+
+# Actions
+- answer_a:
+    description: "Answer: Display"
+    trigger: [a, display, answer a]
+    mutates: { answered: true }
+- answer_b:
+    description: "Answer: Hash + Eq"
+    trigger: [b, hash, eq, answer b]
+    mutates: { score: 1, answered: true }
+- answer_c:
+    description: "Answer: Clone"
+    trigger: [c, clone, answer c]
+    mutates: { answered: true }
+- ask_hint:
+    description: "Ask for a hint"
+    trigger: [hint, help, clue]
+- skip:
+    description: "Skip this question"
+    trigger: [skip, pass, next]
+    mutates: { answered: true }
+
+# Narrator
+tone: encouraging
+voice: second_person
+tense: present
+context: "The quizmaster nods and presents the next question: Which trait must be implemented for a type to be used in a HashMap as a key? A) Display, B) Hash + Eq, C) Clone"
+forbidden: [wrong, stupid, dumb]
+
+# Knowledge
+- question_text
+- answer_options
+- !correct_answer
+
+# Constraints
+- Reveal the correct answer only after the player answers or skips
+- Provide a brief explanation of traits after answering

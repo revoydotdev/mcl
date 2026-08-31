@@ -1,0 +1,30 @@
+[package]
+name = "mcl-nodes"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Node implementations for the MCL graph execution engine"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "nodes", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+mcl-llm = { path = "../mcl-llm", version = "0.1.0" }
+mcl-runtime = { path = "../mcl-runtime", version = "0.1.0" }
+mcl-memory = { path = "../mcl-memory", version = "0.1.0" }
+indexmap = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+rand = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+mcl-llm = { path = "../mcl-llm", version = "0.1.0" }
+
+[lints]
+workspace = true

@@ -1,0 +1,34 @@
+[package]
+name = "mcl-runtime"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Runtime engine for MCL sessions, state management, and context transitions"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "runtime", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-parse = { path = "../mcl-parse", version = "0.1.0" }
+mcl-signal = { path = "../mcl-signal", version = "0.1.0" }
+mcl-llm = { path = "../mcl-llm", version = "0.1.0" }
+mcl-registry = { path = "../mcl-registry", version = "0.1.0" }
+indexmap = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+regex = "1"
+
+[dev-dependencies]
+mcl-graph = { path = "../mcl-graph", version = "0.1.0" }
+tempfile = "3"
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

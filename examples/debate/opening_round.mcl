@@ -1,0 +1,59 @@
+---
+context: opening_round
+type: scene
+domain: debate
+---
+
+# State
+round: 1
+topic: "Should AI systems have knowledge boundaries?"
+score_pro: 0
+score_con: 0
+
+# Entities
+- moderator:
+    type: npc
+    disposition: neutral
+    knowledge: [topic, rules, both_positions]
+
+# Actions
+- argue:
+    description: "Present an argument for your position"
+    trigger: [argue, present, claim, assert, contend, state]
+- rebut:
+    description: "Counter the opponent's last argument"
+    trigger: [rebut, counter, disagree, refute, challenge, respond]
+- concede:
+    description: "Concede a point to the opponent"
+    trigger: [concede, agree, accept, grant, acknowledge]
+- ask_question:
+    target: enum(entities)
+    description: "Ask a clarifying question"
+    trigger: [ask, question, clarify, what about, how, why]
+- summarize:
+    description: "Summarize the arguments so far"
+    trigger: [summarize, recap, review, so far]
+
+# Transitions
+- closing:
+    when: round >= 3
+    direction: next
+
+# Narrator
+tone: analytical
+voice: third_person
+tense: present
+context: "A structured debate is underway on the topic of AI knowledge boundaries. The moderator ensures civil discourse and enforces time limits. Arguments should be evidence-based and logically sound."
+style_notes: "Maintain an impartial, academic tone. Present both sides fairly. The moderator intervenes only when rules are broken."
+forbidden: [definitely, obviously, clearly, everyone knows]
+
+# Knowledge
+- debate_topic
+- debate_rules
+- !opponent_private_notes
+- !judge_scoring_criteria
+
+# Constraints
+- Arguments must be evidence-based
+- Each side gets equal speaking time
+- Personal attacks are not permitted

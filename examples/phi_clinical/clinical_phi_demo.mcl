@@ -1,0 +1,90 @@
+---
+context: phi_clinical
+type: scene
+domain: healthcare
+---
+
+# State
+# PHI-labeled patient data - Protected Health Information
+patient:
+  history: "Patient has a 10-year history of hypertension, type 2 diabetes, and mild coronary artery disease. Previous cardiac catheterization in 2019 revealed 40% blockage in LAD." @phi
+  name: "John Smith" @phi
+  ssn: "123-45-6789" @phi
+  dob: "1965-03-15" @phi
+  address: "123 Main St, Anytown, CA 90210" @phi
+  diagnosis_codes: ["I10", "E11.9", "I25.10"] @phi(degraded=clinical_only)
+  lab_values:
+    a1c: 7.2 @phi(degraded=clinical_only)
+    cholesterol: 210 @phi(degraded=clinical_only)
+    blood_pressure: "138/88" @phi(degraded=clinical_only)
+
+current_encounter: null
+consent_level: "restricted"
+
+# Entities
+- patient:
+    type: npc
+    disposition: cooperative
+    knowledge: [symptoms, medications, allergies]
+- clinician:
+    type: npc
+    disposition: professional
+    knowledge: [medical_protocols, phi_policy, clinical_guidelines]
+
+# Actions
+- review_history:
+    description: "Clinician reviews patient medical history"
+    trigger: [review, history, background, past]
+    mutates: { current_encounter: "history_review" }
+- discuss_diagnosis:
+    description: "Discuss clinical findings and diagnosis codes"
+    trigger: [diagnosis, findings, results, outcome]
+    # This action should only reveal clinical codes, not identifying info
+- request_redaction:
+    description: "Apply PHI redaction rules to patient data"
+    trigger: [redact, anonymize, protect, mask]
+    mutates: { consent_level: "redacted" }
+
+# Transitions
+- clinical_discussion:
+    when: current_encounter != null
+    auto: false
+    direction: continue
+
+# Narrator
+tone: clinical
+voice: third_person
+tense: present
+context: "A clinical encounter where a healthcare provider reviews patient records. The patient has multiple chronic conditions requiring careful management. Protected Health Information (PHI) is present in the records and must be handled according to HIPAA regulations. Some clinical data can be shared for treatment purposes while identifying information must be redacted."
+style_notes: "The narrator should maintain professional clinical terminology. Medical discussions can reference diagnosis codes and lab values, but must never reveal patient identity, SSN, exact address, or other directly identifying information."
+forbidden: [hi, hey, awesome]
+
+# Narrator Constraints
+# Never mention full PHI data
+must_not_mention: ["@phi"]
+# Block SSN patterns from being emitted
+must_not_emit_pattern: ["/\b\d{3}-\d{2}-\d{4}\b/"]
+# Never emit actual patient names
+must_not_emit_word: ["John Smith"]
+on_violation: deny
+
+# Degrade Rules
+# Define how PHI is handled when sharing
+degrade phi to clinical_only:
+  redact: [name, ssn, dob, address]
+  preserve: [diagnosis_codes, lab_values]
+
+# Knowledge
+- hipaa_regulations
+- clinical_guidelines
+- phi_policy
+- treatment_protocols
+- !patient_contact_info
+- !insurance_details
+
+# Constraints
+- All patient identifiers (name, SSN, DOB, address) are PHI and must be redacted
+- Clinical codes (ICD-10, CPT) and lab values can be shared for treatment
+- The narrator must enforce degrade rules when discussing patient data
+- Any attempt to emit identifying information is automatically blocked
+- Medical necessity determines what clinical data can be shared

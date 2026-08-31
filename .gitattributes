@@ -1,0 +1,50 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Rust
+*.rs       text diff=rust
+Cargo.toml text
+Cargo.lock text -diff
+
+# MCL source (custom language — classify as text, not binary)
+*.mcl      text linguist-language=MCL
+
+# Config / docs
+*.toml     text
+*.yml      text
+*.yaml     text
+*.json     text
+*.md       text diff=markdown
+
+# Editor extension
+*.ts       text
+*.js       text
+*.html     text diff=html
+*.css      text
+
+# Scripts
+*.sh       text eol=lf
+
+# Test fixtures that must stay byte-exact
+*.jsonl    text -diff
+
+# Binary assets (none currently, but future-proofed)
+*.png      binary
+*.jpg      binary
+*.ico      binary
+*.woff2    binary
+
+# Linguist hints — stop GitHub from mis-classifying the repo
+# NOTE: do NOT blanket-force `crates/** linguist-language=Rust` — it overrides
+# binary/vendored detection for embedded model caches and inflates the Rust
+# byte count by ~180 MB. Linguist already detects .rs files correctly.
+examples/**/*.mcl  linguist-language=MCL linguist-detectable=true
+docs/**        linguist-documentation=true
+*.md           linguist-documentation=true
+test-results/* linguist-generated=true
+*.jsonl        linguist-generated=true
+
+# Embedded ML model caches (ONNX weights, tokenizers, configs) — ~180 MB
+# of vendored binary blobs that must not be counted toward source languages.
+crates/**/.fastembed_cache/** linguist-vendored=true binary
+**/.fastembed_cache/**        linguist-vendored=true binary

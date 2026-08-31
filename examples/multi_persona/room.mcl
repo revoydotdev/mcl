@@ -1,0 +1,49 @@
+---
+context: haunted_library
+type: room
+domain: rpg
+---
+
+# State
+lit: true
+books_examined: 0
+
+# Entities
+- ghost_librarian:
+    type: npc
+    disposition: cryptic
+    knowledge: [library_history, forbidden_section, book_locations]
+
+# Actions
+- look:
+    description: "Survey the haunted library"
+    trigger: [look, observe, survey, glance]
+- examine:
+    target: enum(entities, items)
+    description: "Examine something closely"
+    trigger: [examine, inspect, study, read]
+- ask:
+    target: enum(entities)
+    description: "Ask the ghost a question"
+    trigger: [ask, question, inquire]
+- pickup:
+    target: enum(items)
+    description: "Pick up an item"
+    trigger: [pick up, grab, take]
+
+# Items
+- ancient_tome: { on: pedestal, interactive: true }
+- dusty_scroll: { on: shelf, visible_when: books_examined > 0 }
+
+# Narrator
+tone: eerie
+voice: second_person
+tense: present
+context: "You stand in a vast library filled with towering shelves of ancient books. Dust motes drift in shafts of pale moonlight. A spectral figure hovers near the far wall — the ghost of the librarian."
+style_notes: "The library feels alive with whispered secrets. Books occasionally shift on their own."
+forbidden: [awesome, cool, epic]
+
+# Knowledge
+- library_history
+- !forbidden_section_contents
+- !ghost_true_identity

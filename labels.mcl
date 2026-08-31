@@ -1,0 +1,18 @@
+---
+context: labels
+type: label_lattice
+---
+
+# Labels
+# Workspace-level lattice per R1 §1.2. Declares the label hierarchy used by
+# the `LabelArbiter` and the narrator filter. `dominates:` makes a label
+# imply another at egress (e.g. anything @phi is also @pii). `default_egress:`
+# sets what the arbiter does when a labeled value attempts to cross a channel
+# whose audience does not include that label.
+- phi:           { dominates: [pii],     default_egress: deny }
+- pii:           {                        default_egress: deny }
+- secret:        { params: [audience],   default_egress: deny }
+- npc_internal:  {                        default_egress: deny }
+- verified:      {                        default_egress: allow }
+- user_content:  {                        default_egress: redact_and_warn }
+- potential_malicious: {                  default_egress: deny }

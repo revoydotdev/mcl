@@ -1,0 +1,62 @@
+---
+context: question_1
+type: step
+domain: quiz
+---
+
+# State
+score: 0
+answered: false
+topic: "Rust Programming"
+question: "What keyword is used to declare an immutable variable in Rust?"
+
+# Entities
+- quizmaster:
+    type: npc
+    disposition: friendly
+    knowledge: [question, correct_answer, explanations]
+
+# Actions
+- answer_a:
+    description: "Answer: let"
+    trigger: [a, let, answer a]
+    mutates: { score: 1, answered: true }
+- answer_b:
+    description: "Answer: var"
+    trigger: [b, var, answer b]
+    mutates: { answered: true }
+- answer_c:
+    description: "Answer: const"
+    trigger: [c, const, answer c]
+    mutates: { answered: true }
+- ask_hint:
+    description: "Ask for a hint about the question"
+    trigger: [hint, help, clue, explain]
+- skip:
+    description: "Skip this question"
+    trigger: [skip, pass, next]
+    mutates: { answered: true }
+
+# Transitions
+- question_2:
+    when: answered == true
+    direction: next
+
+# Narrator
+tone: encouraging
+voice: second_person
+tense: present
+context: "The quizmaster smiles and reads the question aloud: What keyword is used to declare an immutable variable in Rust? Your options are: A) let, B) var, C) const"
+style_notes: "Be encouraging regardless of whether the answer is correct. Explain the reasoning after each answer."
+forbidden: [wrong, stupid, dumb, terrible]
+
+# Knowledge
+- question_text
+- answer_options
+- !correct_answer
+- !other_questions
+
+# Constraints
+- Reveal the correct answer only after the player answers or skips
+- Provide a brief explanation after each answer
+- Keep track of the score

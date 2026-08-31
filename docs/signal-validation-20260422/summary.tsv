@@ -1,0 +1,10 @@
+tier	model	accuracy	turns	correct	malformed	missing	hallucinated	status
+tiny-3b	meta-llama/llama-3.2-3b-instruct	78.3	60	47	0	13	0	ok
+tiny-4b	google/gemma-3-4b-it	41.7	60	25	0	35	0	ok
+small-8b	meta-llama/llama-3.1-8b-instruct	91.7	60	55	0	4	1	ok
+small-12b	mistralai/mistral-nemo	60.0	60	36	0	24	0	ok
+medium-24b	mistralai/mistral-small-3.2-24b-instruct	91.7	60	55	0	5	0	ok
+large-70b	meta-llama/llama-3.3-70b-instruct	83.3	60	50	0	10	0	ok
+flagship-cheap	openai/gpt-4o-mini	75.0	60	45	0	14	1	ok
+flagship-prem	anthropic/claude-3.5-haiku	68.3	60	41	0	19	0	ok
+reasoning-moe	deepseek/deepseek-chat-v3-0324	98.3	60	59	0	1	0	ok

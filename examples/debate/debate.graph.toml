@@ -1,0 +1,40 @@
+[graph]
+name = "ai_debate"
+
+[nodes.client]
+type = "client"
+
+[nodes.narrator]
+type = "llm"
+config.backend = "ollama"
+config.model = "llama3"
+
+[nodes.game_engine]
+type = "game_engine"
+config.contexts_dir = "examples/debate"
+config.start_context = "opening_round"
+
+[[edges]]
+from = "client"
+to = "narrator"
+channel = "user_input"
+
+[[edges]]
+from = "narrator"
+to = "game_engine"
+channel = "narrative"
+
+[[edges]]
+from = "game_engine"
+to = "client"
+channel = "display"
+
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "feedback"
+
+[[edges]]
+from = "game_engine"
+to = "narrator"
+channel = "system_prompt"

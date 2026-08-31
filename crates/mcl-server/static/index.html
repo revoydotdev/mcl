@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCL</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #c0c0c0; font-family: 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; }
+  #status { padding: 4px 12px; font-size: 12px; background: #111; border-bottom: 1px solid #222; }
+  #status.connected { color: #4a4; }
+  #status.disconnected { color: #a44; }
+  #output { flex: 1; overflow-y: auto; padding: 12px; white-space: pre-wrap; line-height: 1.5; }
+  .narrator { color: #c0c0c0; }
+  .system { color: #666; font-style: italic; }
+  .player { color: #4a8; }
+  .narrator.streaming::after {
+    content: '▌';
+    animation: blink 0.7s step-end infinite;
+    color: #888;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  #input-bar { display: flex; border-top: 1px solid #222; background: #111; }
+  #input { flex: 1; background: transparent; border: none; color: #4a8; font-family: inherit; font-size: 14px; padding: 10px 12px; outline: none; }
+  #input::placeholder { color: #444; }
+</style>
+</head>
+<body>
+<div id="status" class="disconnected">Disconnected</div>
+<div id="output"></div>
+<div id="input-bar">
+  <span style="color:#4a8;padding:10px 0 10px 12px">&gt;</span>
+  <input id="input" type="text" placeholder="What do you do?" disabled>
+</div>
+<script>
+(function() {
+  var output = document.getElementById('output');
+  var input = document.getElementById('input');
+  var status = document.getElementById('status');
+  var ws = null;
+  var streamEl = null;
+  var streamQueue = [];
+  var streaming = false;
+
+  function append(text, cls) {
+    var el = document.createElement('div');
+    el.className = cls || 'narrator';
+    el.textContent = text;
+    output.appendChild(el);
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function finalizeStream() {
+    if (streamEl) {
+      streamEl.classList.remove('streaming');
+      streamEl = null;
+    }
+    streaming = false;
+  }
+
+  function drainQueue() {
+    var chunk, delay;
+    if (streamQueue.length === 0) return;
+    chunk = streamQueue.shift();
+    if (!streamEl) {
+      streamEl = document.createElement('div');
+      streamEl.className = 'narrator streaming';
+      output.appendChild(streamEl);
+    }
+    streamEl.textContent += chunk;
+    output.scrollTop = output.scrollHeight;
+    delay = Math.max(8, Math.min(35, 500 / (chunk.length || 1)));
+    setTimeout(drainQueue, delay);
+  }
+
+  function startStreaming(text) {
+    streaming = true;
+    streamQueue.push(text);
+    drainQueue();
+  }
+
+  function handleMessage(data) {
+    var parsed = null;
+    try { parsed = JSON.parse(data); } catch(e) { /* not JSON */ }
+    if (parsed && parsed.type === 'narration_chunk' && typeof parsed.text === 'string') {
+      if (!streaming) {
+        startStreaming(parsed.text);
+      } else {
+        streamQueue.push(parsed.text);
+      }
+    } else if (parsed && parsed.type === 'narration_done') {
+      finalizeStream();
+    } else {
+      finalizeStream();
+      append(data, 'narrator');
+    }
+  }
+
+  function connect() {
+    var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(proto + '//' + location.host + '/play');
+
+    ws.onopen = function() {
+      status.textContent = 'Connected';
+      status.className = 'connected';
+      input.disabled = false;
+      input.focus();
+      append('[Connected to MCL engine]', 'system');
+    };
+
+    ws.onmessage = function(e) { handleMessage(e.data); };
+
+    ws.onclose = function() {
+      finalizeStream();
+      status.textContent = 'Disconnected — refresh to reconnect';
+      status.className = 'disconnected';
+      input.disabled = true;
+      append('[Connection closed]', 'system');
+    };
+
+    ws.onerror = function() {
+      append('[Connection error]', 'system');
+    };
+  }
+
+  input.addEventListener('keydown', function(e) {
+    var text;
+    if (e.key === 'Enter' && input.value.trim()) {
+      text = input.value.trim();
+      append('> ' + text, 'player');
+      ws.send(text);
+      input.value = '';
+    }
+  });
+
+  connect();
+})();
+</script>
+</body>
+</html>

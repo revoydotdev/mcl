@@ -1,0 +1,25 @@
+[package]
+name = "mcl-graph"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Pregel-style graph executor for MCL node networks"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "graph", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-memory = { path = "../mcl-memory", version = "0.1.0" }
+indexmap = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+toml = "0.8"
+
+[lints]
+workspace = true

@@ -1,0 +1,80 @@
+---
+context: crypt_treasury
+type: room
+domain: rpg
+---
+# The treasury is a branching room accessed from crypt_inner once
+# the sarcophagus mechanism reveals the hidden east passage.
+
+# ── State ────────────────────────────────────────────────────
+# Room-level boolean flags.  The runtime tracks these across the
+# session.  They can be mutated by actions (see below).
+treasury_open: false          # Has the treasury been entered/claimed?
+trap_triggered: false         # Has the guardian statue awakened?
+
+# ── Entities ─────────────────────────────────────────────────
+# Each entity has a type, stats, and optional knowledge lists.
+# The game engine uses `type` to decide which resolver handles it.
+- guardian_statue:
+    type: trap
+    hp: 999                   # Effectively indestructible
+    disposition: dormant
+
+# ── Items ────────────────────────────────────────────────────
+# Items can be placed on surfaces, near landmarks, or gated behind
+# conditions.  These are the rewards for reaching the treasury.
+- ancient_crown:
+    description: "A jeweled crown of immense value"
+- gold_chest:
+    description: "A heavy iron chest filled with gold coins"
+
+# ── Actions ──────────────────────────────────────────────────
+# Players trigger actions.  `requires` lists preconditions (inventory
+# checks or state flags).  `mutates` patches room state when the
+# action fires.  `resolution` names the external system that
+# determines the outcome.
+- open_treasury:
+    requires: [!treasury_open]
+    mutates: { treasury_open: true }
+    description: "Step into the treasury and claim its riches"
+- examine_statue:
+    description: "Study the imposing guardian statue"
+- take_crown:
+    requires: [treasury_open]
+    resolution: inventory_system
+    description: "Take the ancient crown from its pedestal"
+- pickup:
+    target: enum(items)
+    resolution: inventory_system
+    description: "Pick up an item"
+- look:
+    description: "Survey the treasury chamber"
+
+# ── Transitions ──────────────────────────────────────────────
+# Links to other rooms.  `direction` is the compass exit.
+- crypt_inner:
+    direction: south
+
+# ── Narrator ─────────────────────────────────────────────────
+# Instructions for the LLM when narrating this room.  `tone` sets
+# the mood, `voice` the perspective, `forbidden` lists words the
+# narrator must never use.
+tone: awe
+voice: second_person
+tense: present
+context: "Beyond the hidden passage, a vaulted chamber gleams with reflected torchlight. Gold coins spill from iron-bound chests across the marble floor. At the center, on a stone pedestal, rests an ancient crown encrusted with jewels that catch every flicker of light. A massive statue of a robed guardian looms in the alcove behind it, stone eyes half-closed as if in eternal vigil."
+style_notes: "The treasury should feel earned — a moment of wonder after the tension of the preceding rooms. The guardian statue is ominous but inert unless provoked. Describe the crown with reverence."
+forbidden: [modern, technology, electric]
+
+# ── Knowledge ────────────────────────────────────────────────
+# What the LLM knows (positive) or must ignore (! prefix) about
+# this context.  This constrains hallucination.
+- ancient_civilization
+- !exit_code
+
+# ── Constraints ──────────────────────────────────────────────
+# Free-form rules the game engine enforces.  These are softer than
+# state/action constraints — they guide the LLM and runtime logic.
+- The guardian statue awakens if the crown is taken carelessly
+- The gold chest can be looted freely once the treasury is open
+- The crown is the most valuable single item in the dungeon

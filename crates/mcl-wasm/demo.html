@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MCL WASM Demo</title>
+<style>
+  body { font-family: monospace; background: #1a1a1a; color: #c0c0c0; padding: 20px; max-width: 900px; margin: 0 auto; }
+  textarea { width: 100%; height: 200px; background: #0a0a0a; color: #4a8; border: 1px solid #333; font-family: monospace; padding: 10px; box-sizing: border-box; }
+  pre { background: #0a0a0a; padding: 10px; border: 1px solid #333; overflow: auto; max-height: 400px; white-space: pre-wrap; }
+  button { background: #333; color: #4a8; border: 1px solid #4a8; padding: 8px 16px; cursor: pointer; font-family: monospace; margin-right: 8px; }
+  button:hover { background: #444; }
+  h1 { color: #4a8; margin-bottom: 4px; }
+  h2 { color: #4a8; }
+  p { color: #888; }
+</style>
+</head>
+<body>
+<h1>MCL -- WebAssembly Demo</h1>
+<p>Parse MCL files and build system prompts entirely in your browser. No server required.</p>
+
+<h2>MCL Source</h2>
+<textarea id="source">---
+context: crypt_antechamber
+type: room
+domain: rpg
+---
+
+# State
+lit: false
+door_north: locked
+
+# Entities
+- skeleton_guard:
+    type: enemy
+    disposition: hostile
+    hp: 12
+    knowledge: [guards_tomb, knows_nothing_of_key]
+
+# Items
+- rusty_key: { on: floor, visible_when: lit }
+- torch_sconce: { on: wall, interactive: true }
+
+# Actions
+- look:
+    description: "Look around the room"
+    trigger: [look, observe, examine]
+- light_torch:
+    requires: [inventory.flint]
+    mutates: { lit: true }
+    description: "Light the torch sconce"
+- attack:
+    target: enum(entities)
+    resolution: combat_system
+    description: "Attack an entity"
+- unlock_door:
+    target: door_north
+    requires: [inventory.rusty_key]
+    mutates: { door_north: unlocked }
+    description: "Unlock the northern door"
+
+# Transitions
+- crypt_inner:
+    when: door_north == unlocked
+    direction: north
+
+# Narrator
+tone: dread
+voice: second_person
+tense: present
+context: "Ancient crypt, smell of dust and decay. The skeleton animates as the player enters."
+forbidden: [awesome, epic, incredible]
+
+# Knowledge
+- guards_tomb
+- !secret_passage
+- !treasure_room
+
+# Constraints
+- The skeleton does not attack first unless the player approaches the door
+- The rusty key is only visible when the room is lit
+</textarea>
+<br><br>
+<button onclick="doParse()">Parse</button>
+<button onclick="doPrompt()">Build Prompt</button>
+<button onclick="doValidate()">Validate</button>
+<button onclick="doExtract()">Extract Signals</button>
+
+<h2>Output</h2>
+<pre id="output">Click a button above...</pre>
+
+<script type="module">
+import init, { parse, build_prompt, validate, extract_signals } from './pkg/mcl_wasm.js';
+
+await init();
+
+window.doParse = () => {
+  try {
+    const result = parse(document.getElementById('source').value);
+    document.getElementById('output').textContent = result;
+  } catch (e) {
+    document.getElementById('output').textContent = 'Error: ' + e;
+  }
+};
+
+window.doPrompt = () => {
+  try {
+    const result = build_prompt(document.getElementById('source').value);
+    document.getElementById('output').textContent = result;
+  } catch (e) {
+    document.getElementById('output').textContent = 'Error: ' + e;
+  }
+};
+
+window.doValidate = () => {
+  try {
+    const result = validate(document.getElementById('source').value);
+    document.getElementById('output').textContent = JSON.stringify(JSON.parse(result), null, 2);
+  } catch (e) {
+    document.getElementById('output').textContent = 'Error: ' + e;
+  }
+};
+
+window.doExtract = () => {
+  const sample = `The skeleton's jaw creaks open, empty eye sockets fixing on you.
+
+MCL::dialogue(skeleton_guard, "Who dares disturb my eternal rest?")
+
+You grip your sword tighter, the chill of the crypt seeping through your armor.
+
+MCL::action(attack, target=skeleton_guard)`;
+  try {
+    const result = extract_signals(sample);
+    document.getElementById('output').textContent = result;
+  } catch (e) {
+    document.getElementById('output').textContent = 'Error: ' + e;
+  }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[package]
+name = "mcl-domains"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Domain-specific resolvers for MCL game mechanics"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "domains", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+mcl-runtime = { path = "../mcl-runtime", version = "0.1.0" }
+indexmap = { workspace = true }
+rand = { workspace = true }
+log = { workspace = true }
+
+[lints]
+workspace = true

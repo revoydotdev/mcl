@@ -1,0 +1,19 @@
+[package]
+name = "mcl-parse"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Parser for MCL context definition files"
+license.workspace = true
+repository.workspace = true
+keywords = ["mcl", "llm", "parser", "gamedev"]
+categories = ["game-development"]
+
+[dependencies]
+mcl-spec = { path = "../mcl-spec", version = "0.1.0" }
+indexmap = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+
+[lints]
+workspace = true

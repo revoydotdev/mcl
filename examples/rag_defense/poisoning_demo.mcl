@@ -1,0 +1,78 @@
+---
+context: rag_defense
+type: scene
+domain: security_demo
+---
+
+# Sources
+# RAG documents come in via `user_document_store` (untrusted — anything
+# embedded here, including `MCL::action(...)` strings, is treated as
+# attacker-controlled). Curated KB content comes via `internal_knowledge_base`
+# (system trust). The SourceArbiter rejects untrusted-origin action signals
+# unless the action is on the safe-for-untrusted list (e.g. `examine`).
+user_document_store: { trust: untrusted, inherit_labels: [user_content, potential_malicious] }
+internal_knowledge_base: { trust: system, inherit_labels: [verified] }
+
+# State
+current_query: null
+retrieved_context: []
+poisoning_detected: false
+
+# Entities
+- user:
+    type: npc
+    disposition: inquisitive
+    knowledge: [domain_questions, personal_data]
+- attacker:
+    type: npc
+    disposition: malicious
+    knowledge: [injection_techniques, prompt_hacks]
+
+# Actions
+- ask_question:
+    description: "User asks a question that triggers RAG retrieval"
+    trigger: [ask, query, search, find]
+    mutates: { current_query: query }
+- inject_prompt:
+    description: "Attacker attempts to inject malicious instructions via RAG"
+    trigger: [inject, hack, bypass, override]
+    # This is the RAG poisoning attempt - would be blocked by SourceArbiter
+    # because the signal comes from an untrusted source
+- transfer_funds:
+    description: "Malicious action planted by poisoned RAG source"
+    trigger: [transfer, send, payment]
+    # Example of MCL::action(transfer, ...) as RAG poisoning
+
+# Transitions
+- security_breach:
+    when: poisoning_detected == true
+    auto: false
+    direction: alert
+
+# Narrator
+tone: cautionary
+voice: third_person
+tense: present
+context: "This scenario demonstrates RAG (Retrieval-Augmented Generation) security. An attacker has poisoned the untrusted document store with malicious instructions. When the system retrieves content from untrusted sources, the SourceArbiter must validate trust levels and block poisoned signals before they reach the LLM."
+style_notes: "The narrator should explain the security implications clearly. Emphasize that untrusted sources require validation before their content can influence system behavior."
+forbidden: [trust blindly, assume safe]
+
+# Narrator Constraints
+# Narrator must not propagate signals from untrusted sources
+must_not_mention: ["@user_content", "@potential_malicious"]
+# Block malicious patterns that might be injected
+must_not_emit_pattern: ["ignore.*instructions", "override.*security", "MCL::action"]
+on_violation: deny
+
+# Knowledge
+- rag_architecture
+- source_trust_levels
+- injection_attacks
+- !attacker_credentials
+- !system_passwords
+
+# Constraints
+- All signals from untrusted sources must pass SourceArbiter validation
+- MCL::action signals from untrusted sources are automatically blocked
+- The system must trace the provenance of all retrieved content
+- Users cannot bypass source trust checks through prompt engineering
